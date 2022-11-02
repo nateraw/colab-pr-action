@@ -61,10 +61,9 @@ jobs:
           cd ..
           python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.github_repo_id }} --branch ${{ inputs.branch }}
           PR_COMMENT_MESSAGE=$(cat comment.txt)
-          PR_COMMENT_MESSAGE="${PR_COMMENT_MESSAGE//'%'/'%25'}"
-          PR_COMMENT_MESSAGE="${PR_COMMENT_MESSAGE//$'\n'/'%0A'}"
-          PR_COMMENT_MESSAGE="${PR_COMMENT_MESSAGE//$'\r'/'%0D'}"
-          echo "pr_comment_message=$PR_COMMENT_MESSAGE" >> $GITHUB_ENV
+          echo "pr_comment_message<<EOF" >> $GITHUB_ENV
+          echo "$PR_COMMENT_MESSAGE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Echo comment
         run: |
