@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 
+from git import Repo
 from tabulate import tabulate
 
 
@@ -8,17 +9,19 @@ def parse_args(args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--root_dir", type=str, required=True)
     parser.add_argument("--repo_id", type=str, required=True)
-    parser.add_argument("--branch", type=str, required=True)
     return parser.parse_args(args)
 
 
-def main(root_dir: str, repo_id: str, branch: str):
+def main(root_dir: str, repo_id: str):
     root_dir = Path(root_dir)
     if not root_dir.exists():
         raise ValueError(f"root_dir {root_dir} does not exist")
 
+    repo = Repo(root_dir)
+    branch = repo.active_branch.name
+
     notebook_paths = sorted(root_dir.glob("**/*.ipynb"))
-    
+
     table_data = []
     for notebook_path in notebook_paths:
         relpath = notebook_path.relative_to(root_dir)
@@ -28,7 +31,7 @@ def main(root_dir: str, repo_id: str, branch: str):
         colab_badge_md = f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colab_link})"
         row = [gh_link_md, colab_badge_md]
         table_data.append(row)
-    
+
     md_table = tabulate(table_data, headers=["Notebook", "Colab"], tablefmt="github")
     comment = f"Here are links to notebooks available in this branch:\n\n{md_table}"
     Path('comment.txt').write_text(comment)

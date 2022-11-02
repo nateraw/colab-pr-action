@@ -9,9 +9,6 @@ on:
       pr_number:
         required: true
         type: string
-      branch:
-        required: true
-        type: string
     secrets:
       write_token:
         required: false
@@ -25,7 +22,6 @@ jobs:
         run: |
           echo "- github_repo_id: ${{ inputs.github_repo_id }}"
           echo "- pr_number: ${{ inputs.pr_number }}"
-          echo "- branch: ${{ inputs.branch }}"
       - name: Checkout Action GitHub Repo
         uses: actions/checkout@v2
         with:
@@ -57,17 +53,13 @@ jobs:
         run: |
           cd cloned_action_repo
           git pull origin main
-          pip install tabulate
+          pip install tabulate GitPython
           cd ..
-          python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.github_repo_id }} --branch ${{ inputs.branch }}
+          python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.github_repo_id }}
           PR_COMMENT_MESSAGE=$(cat comment.txt)
           echo "pr_comment_message<<EOF" >> $GITHUB_ENV
           echo "$PR_COMMENT_MESSAGE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-
-      # - name: Echo comment
-      #   run: |
-      #     echo ${{ env.pr_comment_message }}
 
       - name: Find pr comment
         uses: peter-evans/find-comment@v1
