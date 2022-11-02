@@ -9,9 +9,6 @@ on:
       pr_number:
         required: true
         type: string
-      branch:
-        required: true
-        type: string
     secrets:
       write_token:
         required: false
@@ -34,7 +31,7 @@ jobs:
             echo "write_token=${{ secrets.WRITE_TOKEN }}" >> $GITHUB_ENV
           fi
 
-      - name: Find doc comment
+      - name: Find pr comment
         if: ${{ always() }}
         uses: peter-evans/find-comment@v1
         id: find_comment
