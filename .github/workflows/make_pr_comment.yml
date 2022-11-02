@@ -59,7 +59,7 @@ jobs:
           git pull origin main
           pip install tabulate
           cd ..
-          output=$(python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.repo_id }} --branch ${{ inputs.branch }})
+          output=$(python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.github_repo_id }} --branch ${{ inputs.branch }})
           echo "::set-output name=pr_comment_message::$output"
 
       - name: Find pr comment
