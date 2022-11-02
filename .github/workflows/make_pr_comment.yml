@@ -80,7 +80,7 @@ jobs:
           GITHUB_TOKEN: ${{ env.write_token }}
 
       - name: Update pr comment if necessary
-        if: github.event.action == 'reopened' && steps.find_comment.outputs.comment-id != ''
+        if: steps.find_comment.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.find_comment.outputs.comment-id }}
