@@ -53,7 +53,7 @@ jobs:
         run: |
           cd cloned_action_repo
           git pull origin main
-          pip install tabulate GitPython
+          pip install tabulate
           cd ..
           python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.github_repo_id }}
           PR_COMMENT_MESSAGE=$(cat comment.txt)

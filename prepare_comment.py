@@ -1,7 +1,8 @@
 import argparse
+import os
+import subprocess
 from pathlib import Path
 
-from git import Repo
 from tabulate import tabulate
 
 
@@ -12,13 +13,24 @@ def parse_args(args=None):
     return parser.parse_args(args)
 
 
+def get_branch(root):
+    with open(os.devnull, "wb") as null_stream:
+        result = subprocess.check_output(
+            f"cd {root} && git rev-parse --abbrev-ref HEAD",
+            shell=True,
+            stdin=null_stream,
+            stderr=null_stream,
+        )
+    result = result.decode('utf-8')
+    result = result.strip()
+    return result
+
 def main(root_dir: str, repo_id: str):
     root_dir = Path(root_dir)
     if not root_dir.exists():
         raise ValueError(f"root_dir {root_dir} does not exist")
 
-    repo = Repo(root_dir)
-    branch = repo.active_branch.name
+    branch = get_branch(root_dir)
 
     notebook_paths = sorted(root_dir.glob("**/*.ipynb"))
 
