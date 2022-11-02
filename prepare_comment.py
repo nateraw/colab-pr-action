@@ -30,7 +30,8 @@ def main(root_dir: str, repo_id: str, branch: str):
         table_data.append(row)
     
     md_table = tabulate(table_data, headers=["Notebook", "Colab"], tablefmt="github")
-    print(f"Here are links to notebooks available in this branch:\n\n{md_table}")
+    comment = f"Here are links to notebooks available in this branch:\n\n{md_table}"
+    Path('comment.txt').write_text(comment)
 
 if __name__ == "__main__":
     args = parse_args()
