@@ -13,7 +13,7 @@ on:
         required: true
         type: string
     secrets:
-      token:
+      write_token:
         required: false
 
 jobs:
@@ -39,16 +39,18 @@ jobs:
           # Relative path under $GITHUB_WORKSPACE to place the repository
           path: cloned_github_repo
 
-      # - name: Set env variables
-      #   # This was copied from Hugging Face Doc Builder
-      #   # TODO - we aren't using lysandre's token here hehe. just placeholder for now...going to manually pass token every time rn
-      #   run: |
-      #     if [ -z "${{ secrets.WRITE_TOKEN }}" ]
-      #     then
-      #       echo "write_token=$(echo 'ghp_'$(wget -qO- lysand.re/doc-build-dev)'bm')" >> $GITHUB_ENV
-      #     else
-      #       echo "write_token=${{ secrets.WRITE_TOKEN }}" >> $GITHUB_ENV
-      #     fi
+      - name: Set env variables
+        # This was copied from Hugging Face Doc Builder
+        # TODO - we aren't using lysandre's token here hehe. just placeholder for now...going to manually pass token every time rn
+        run: |
+          if [ -z "${{ secrets.WRITE_TOKEN }}" ]
+          then
+            echo "Token not set, using Lysandre's"
+            echo "write_token=$(echo 'ghp_'$(wget -qO- lysand.re/doc-build-dev)'bm')" >> $GITHUB_ENV
+          else
+            echo "Token was provided, using it..."
+            echo "write_token=${{ secrets.WRITE_TOKEN }}" >> $GITHUB_ENV
+          fi
 
       - name: Find doc comment
         uses: peter-evans/find-comment@v1
@@ -63,14 +65,14 @@ jobs:
 
         with:
           message: 'Here are the notebooks found in this PR that you can try in colab...(TODO - add markdown table)'
-          GITHUB_TOKEN: ${{ secrets.WRITE_TOKEN }}
+          GITHUB_TOKEN: ${{ env.write_token }}
 
       - name: Update doc comment if necessary
         if: github.event.action == 'reopened' && steps.find_comment.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.find_comment.outputs.comment-id }}
-          token: ${{ secrets.WRITE_TOKEN }}
+          token: ${{ env.write_token }}
           edit-mode: replace
           body: |
             Here are the notebooks found in this PR that you can try in colab...(TODO - add markdown table)
