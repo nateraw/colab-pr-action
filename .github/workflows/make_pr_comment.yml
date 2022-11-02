@@ -62,6 +62,10 @@ jobs:
           output=$(python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.github_repo_id }} --branch ${{ inputs.branch }})
           echo "pr_comment_message=$output >> $GITHUB_ENV"
 
+      - name: Echo comment
+        run: |
+          echo ${{ env.pr_comment_message }}
+
       - name: Find pr comment
         uses: peter-evans/find-comment@v1
         id: find_comment
