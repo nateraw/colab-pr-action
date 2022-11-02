@@ -9,6 +9,9 @@ on:
       pr_number:
         required: true
         type: string
+      commit_sha:
+        required: true
+        type: string
     secrets:
       write_token:
         required: false
@@ -55,7 +58,7 @@ jobs:
           git pull origin main
           pip install tabulate
           cd ..
-          python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.github_repo_id }}
+          python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.github_repo_id }} --commit_sha ${{ inputs.commit_sha }}
           PR_COMMENT_MESSAGE=$(cat comment.txt)
           echo "pr_comment_message<<EOF" >> $GITHUB_ENV
           echo "$PR_COMMENT_MESSAGE" >> $GITHUB_ENV
