@@ -1,4 +1,4 @@
-name: Make PR Comment
+name: Delete Doc Comment
 
 on:
   workflow_call:
@@ -17,28 +17,10 @@ on:
         required: false
 
 jobs:
-  make_colab_pr_comment:
+  build_and_package:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Echo everything
-        run: |
-          echo "- github_repo_id: ${{ inputs.github_repo_id }}"
-          echo "- pr_number: ${{ inputs.pr_number }}"
-          echo "- branch: ${{ inputs.branch }}"
-      - name: Checkout Action GitHub Repo
-        uses: actions/checkout@v2
-        with:
-          repository: 'nateraw/colab-pr-action'
-          path: cloned_action_repo
-
-      - name: Checkout Source GitHub Repo
-        uses: actions/checkout@v2
-        with:
-          repository: '${{ inputs.github_repo_id }}'
-          # Relative path under $GITHUB_WORKSPACE to place the repository
-          path: cloned_github_repo
-
       - name: Set env variables
         # This was copied from Hugging Face Doc Builder
         # TODO - we aren't using lysandre's token here hehe. just placeholder for now...going to manually pass token every time rn
@@ -52,27 +34,20 @@ jobs:
             echo "write_token=${{ secrets.WRITE_TOKEN }}" >> $GITHUB_ENV
           fi
 
-      - name: Find pr comment
+      - name: Find doc comment
+        if: ${{ always() }}
         uses: peter-evans/find-comment@v1
         id: find_comment
         with:
           issue-number: ${{ inputs.pr_number }}
           comment-author: nateraw
 
-      - name: Add pr comment if not present
-        uses: thollander/actions-comment-pull-request@v1
-        if: steps.find_comment.outputs.comment-id == ''
-
-        with:
-          message: 'Here are the notebooks found in this PR that you can try in colab...(TODO - add markdown table)'
-          GITHUB_TOKEN: ${{ env.write_token }}
-
       - name: Update pr comment if necessary
-        if: github.event.action == 'reopened' && steps.find_comment.outputs.comment-id != ''
+        if: steps.find_comment.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.find_comment.outputs.comment-id }}
           token: ${{ env.write_token }}
           edit-mode: replace
           body: |
-            Here are the notebooks found in this PR that you can try in colab...(TODO - add markdown table)
+            _The notebook links are not available anymore as the PR was closed or merged._
