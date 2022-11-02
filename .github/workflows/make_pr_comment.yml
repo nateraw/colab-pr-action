@@ -21,6 +21,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Echo everything
+        run: |
+          echo "- github_repo_id: ${{ inputs.github_repo_id }}"
+          echo "- pr_number: ${{ inputs.pr_number }}"
+          echo "- branch: ${{ inputs.branch }}"
       - name: Checkout Action GitHub Repo
         uses: actions/checkout@v2
         with:
@@ -35,6 +40,7 @@ jobs:
           path: cloned_github_repo
 
       # - name: Set env variables
+      #   # This was copied from Hugging Face Doc Builder
       #   # TODO - we aren't using lysandre's token here hehe. just placeholder for now...going to manually pass token every time rn
       #   run: |
       #     if [ -z "${{ secrets.WRITE_TOKEN }}" ]
