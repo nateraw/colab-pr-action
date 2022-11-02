@@ -65,9 +65,9 @@ jobs:
           echo "$PR_COMMENT_MESSAGE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Echo comment
-        run: |
-          echo ${{ env.pr_comment_message }}
+      # - name: Echo comment
+      #   run: |
+      #     echo ${{ env.pr_comment_message }}
 
       - name: Find pr comment
         uses: peter-evans/find-comment@v1
