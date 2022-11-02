@@ -60,7 +60,7 @@ jobs:
           pip install tabulate
           cd ..
           output=$(python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.github_repo_id }} --branch ${{ inputs.branch }})
-          echo "::set-output name=pr_comment_message::$output"
+          echo "pr_comment_message=$output >> $GITHUB_ENV"
 
       - name: Find pr comment
         uses: peter-evans/find-comment@v1
