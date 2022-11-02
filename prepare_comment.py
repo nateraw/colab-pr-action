@@ -21,10 +21,16 @@ def main(root_dir: str, repo_id: str, branch: str):
     
     table_data = []
     for notebook_path in notebook_paths:
-        row = [notebook_path, f"https://github.com/{repo_id}/blob/{branch}/{notebook_path.relative_to(root_dir)}"]
+        relpath = notebook_path.relative_to(root_dir)
+        gh_link = f"https://github.com/{repo_id}/blob/{branch}/{relpath}"
+        gh_link_md = f"[{relpath}]({gh_link})"
+        colab_link = f"https://colab.research.google.com/github/{repo_id}/blob/{branch}/{relpath}"
+        colab_badge_md = f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colab_link})"
+        row = [gh_link_md, colab_badge_md]
         table_data.append(row)
     
-    return tabulate(table_data, headers=["Notebook", "Link"], tablefmt="github")
+    md_table = tabulate(table_data, headers=["Notebook", "Colab"], tablefmt="github")
+    print(f"Here are links to notebooks available in this branch:\n\n{md_table}")
 
 if __name__ == "__main__":
     args = parse_args()

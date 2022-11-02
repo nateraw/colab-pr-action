@@ -52,6 +52,16 @@ jobs:
             echo "write_token=${{ secrets.WRITE_TOKEN }}" >> $GITHUB_ENV
           fi
 
+      - name: Make comment
+        shell: bash
+        run: |
+          cd cloned_action_repo
+          git pull origin main
+          pip install tabulate
+          cd ..
+          output=$(python cloned_action_repo/prepare_comment.py --root_dir cloned_github_repo --repo_id ${{ inputs.repo_id }} --branch ${{ inputs.branch }})
+          echo "::set-output name=pr_comment_message::$output"
+
       - name: Find pr comment
         uses: peter-evans/find-comment@v1
         id: find_comment
@@ -64,7 +74,7 @@ jobs:
         if: steps.find_comment.outputs.comment-id == ''
 
         with:
-          message: 'Here are the notebooks found in this PR that you can try in colab...(TODO - add markdown table)'
+          message: ${{ env.pr_comment_message }}
           GITHUB_TOKEN: ${{ env.write_token }}
 
       - name: Update pr comment if necessary
@@ -75,4 +85,4 @@ jobs:
           token: ${{ env.write_token }}
           edit-mode: replace
           body: |
-            Here are the notebooks found in this PR that you can try in colab...(TODO - add markdown table)
+            ${{ env.pr_comment_message }}
