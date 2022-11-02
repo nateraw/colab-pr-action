@@ -1,0 +1,60 @@
+name: Make PR Comment
+
+on:
+  workflow_call:
+    inputs:
+      github_repo_id:
+        required: true
+        type: string
+      pr_number:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+    secrets:
+      token:
+        required: false
+
+jobs:
+  make_colab_pr_comment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Action GitHub Repo
+        uses: actions/checkout@v2
+        with:
+          repository: 'nateraw/colab-pr-action'
+          path: cloned_action_repo
+
+      - name: Checkout Source GitHub Repo
+        uses: actions/checkout@v2
+        with:
+          repository: '${{ inputs.github_repo_id }}'
+          # Relative path under $GITHUB_WORKSPACE to place the repository
+          path: cloned_github_repo
+
+      - name: Find doc comment
+        uses: peter-evans/find-comment@v1
+        id: find_comment
+        with:
+          issue-number: ${{ inputs.pr_number }}
+          comment-author: nateraw
+
+      - name: Add doc comment if not present
+        uses: thollander/actions-comment-pull-request@v1
+        if: steps.find_comment.outputs.comment-id == ''
+
+        with:
+          message: 'Here are the notebooks found in this PR that you can try in colab...(TODO - add markdown table)'
+          GITHUB_TOKEN: ${{ env.write_token }}
+
+      - name: Update doc comment if necessary
+        if: github.event.action == 'reopened' && steps.find_comment.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          token: ${{ env.write_token }}
+          edit-mode: replace
+          body: |
+            Here are the notebooks found in this PR that you can try in colab...(TODO - add markdown table)
